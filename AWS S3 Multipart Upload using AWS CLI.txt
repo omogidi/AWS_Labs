@@ -11,6 +11,7 @@ yum update -y
 mkdir /home/ec2-user/whizlabs/
 aws s3 cp s3://labtask69/video.mp4 /home/ec2-user/whizlabs/
 
+
 Launch EC2 Instance
 SSH into EC2
 
