@@ -1,0 +1,11 @@
+## Creating an S3 bucket with Presigned URL
+#Create a bucket in s3
+
+#ACLs enabled
+
+#Every other setting as default.
+
+#Log into the AWS CLI and run
+aws s3 presigned s3://signedbucket123/smiley.jpg --expires-in 60
+
+#Copy the link and paste to confirm status

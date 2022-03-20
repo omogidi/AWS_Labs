@@ -1,0 +1,97 @@
+### AWS S3 Multipart Upload using AWS CLI
+
+## Create IAM Role
+
+## Create EC2 and Select the IAM Role created
+
+In the userdata, include the below user dta
+#!/bin/bash
+sudo su
+yum update -y
+mkdir /home/ec2-user/whizlabs/
+aws s3 cp s3://labtask69/video.mp4 /home/ec2-user/whizlabs/
+
+Launch EC2 Instance
+SSH into EC2
+
+Splitted the file into chunks
+The split command will split a large file into many pieces (chunks) based on the option.
+
+Divided the 143 MB file into 40MB chunks. [ -b option means Bytes ]
+split -b 40M video.mp4
+ls -lh
+-- Info: Here "xaa" and "xad" are the chunked files that have been renamed alphabetically. Each file is 40MB in size but except the last one. The number of chunks depends on the size of your original file and the byte value used to partition the chunks
+
+Initiated the multipart upload using an AWS CLI command, which will generate a UploadID that will be used later.
+aws s3api create-multipart-upload --bucket multiparts3bucket --key video.mp4
+
+ "UploadId": "SsH0_1yQo0bXCjz.7000m_lIFSKDZ36SZkBBbEKuSDM4lB0upxPLIFoLUeWq6sKDiANueo3yrnAfUJwUgHcy7duIG.6O0HI.A2ozLC4QTiDAMrGCmaE_5eVZ3cHVXdtKVtg_kULQsPfjbcUkMNdQEg--",
+
+### Next, I uploaded each file chunk one by one, using the part number. The part number is assigned based on the alphabetic order of the file.
+aws s3api upload-part --bucket multiparts3bucket --key video.mp4 --part-number 1 --body xaa --upload-id SsH0_1yQo0bXCjz.7000m_lIFSKDZ36SZkBBbEKuSDM4lB0upxPLIFoLUeWq6sKDiANueo3yrnAfUJwUgHcy7duIG.6O0HI.A2ozLC4QTiDAMrGCmaE_5eVZ3cHVXdtKVtg_kULQsPfjbcUkMNdQEg--
+aws s3api upload-part --bucket multiparts3bucket --key video.mp4 --part-number 2 --body xab --upload-id SsH0_1yQo0bXCjz.7000m_lIFSKDZ36SZkBBbEKuSDM4lB0upxPLIFoLUeWq6sKDiANueo3yrnAfUJwUgHcy7duIG.6O0HI.A2ozLC4QTiDAMrGCmaE_5eVZ3cHVXdtKVtg_kULQsPfjbcUkMNdQEg--
+aws s3api upload-part --bucket multiparts3bucket --key video.mp4 --part-number 3 --body xac --upload-id SsH0_1yQo0bXCjz.7000m_lIFSKDZ36SZkBBbEKuSDM4lB0upxPLIFoLUeWq6sKDiANueo3yrnAfUJwUgHcy7duIG.6O0HI.A2ozLC4QTiDAMrGCmaE_5eVZ3cHVXdtKVtg_kULQsPfjbcUkMNdQEg--
+aws s3api upload-part --bucket multiparts3bucket --key video.mp4 --part-number 4 --body xad --upload-id SsH0_1yQo0bXCjz.7000m_lIFSKDZ36SZkBBbEKuSDM4lB0upxPLIFoLUeWq6sKDiANueo3yrnAfUJwUgHcy7duIG.6O0HI.A2ozLC4QTiDAMrGCmaE_5eVZ3cHVXdtKVtg_kULQsPfjbcUkMNdQEg--
+
+--ETAGS
+"ETag": "\"70418ed5e552ea21deb8785359e69e28\""      - xaa
+"ETag": "\"e0c16ead703bfcd1b36b339d9ae1901d\""       -xab
+"ETag": "\"56734bc19b453aab5144de4454945609\""       -xac
+"ETag": "\"7786233d68592caf07e93521cbd0a80e\""       -xad
+
+
+## Created a file with all part numbers with their Etag values.
+nano list.json
+{
+
+  "Parts": [
+
+    {
+
+      "PartNumber": 1,
+
+      "ETag": "\"70418ed5e552ea21deb8785359e69e28\""
+
+    },
+
+    {
+
+      "PartNumber": 2,
+
+      "ETag": "\"e0c16ead703bfcd1b36b339d9ae1901d\""
+
+    },
+
+    {
+
+      "PartNumber": 3,
+
+      "ETag": "\"56734bc19b453aab5144de4454945609\""
+
+    },
+
+    {
+
+      "PartNumber": 4,
+
+      "ETag": "\"7786233d68592caf07e93521cbd0a80e\""
+
+    }
+
+  ]
+
+}
+Save file CTRL+X
+
+Completed the Multipart Upload
+aws s3api complete-multipart-upload --multipart-upload file://list.json --bucket multiparts3bucket --key video.mp4 --upload-id SsH0_1yQo0bXCjz.7000m_lIFSKDZ36SZkBBbEKuSDM4lB0upxPLIFoLUeWq6sKDiANueo3yrnAfUJwUgHcy7duIG.6O0HI.A2ozLC4QTiDAMrGCmaE_5eVZ3cHVXdtKVtg_kULQsPfjbcUkMNdQEg--
+-
+
+
+
+
+
+
+
+
+

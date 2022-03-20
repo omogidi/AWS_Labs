@@ -1,0 +1,25 @@
+## Accessing S3 with AWS IAM Roles
+#Navigate to IAM >> Create Roles
+
+#Select AWS Service and EC2.. Click Next
+
+#Search for S3FullAccess and select next.
+
+#Create Tags and give the Role aname
+
+#Launch an EC2 instance - Check Launch an EC2 instance labs
+
+#In the IAM role select the name of the IAM S3role
+
+#Launch
+
+#SSH into your instance
+
+#Ran the below command to find your S3 bucket via CLI.
+aws s3 ls
+#Created a new text file and upload it to the bucket via AWS CLI (using the following set of commands):
+touch test.txt
+aws s3 mv test.txt s3://<your_bucket_name>
+
+#You can also list the files uploaded to S3 bucket via CLI from the EC2 instance with the following command:
+aws s3 ls s3://<your_bucket_name>
